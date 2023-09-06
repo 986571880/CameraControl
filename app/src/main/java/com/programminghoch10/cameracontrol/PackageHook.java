@@ -6,6 +6,8 @@ import android.util.Log;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import de.robv.android.xposed.XposedHelpers;
+import de.robv.android.xposed.XC_MethodHook;
 
 public class PackageHook implements IXposedHookLoadPackage {
 	
@@ -40,6 +42,16 @@ public class PackageHook implements IXposedHookLoadPackage {
 			CameraManagerHook.hook(lpparam, cameraPreferences);
 			CameraHook.hook(lpparam, cameraPreferences);
 		}
+
+		// 自用的一个修改，强制使用前置摄像头来扫码，有时间了也许写一个单独的模块，现在先用这个凑合着
+		try{
+			XposedHelpers.findAndHookMethod("com.google.zxing.client.android.camera.open.OpenCameraInterface",lpparam.classLoader,"open",int.class, new XC_MethodHook(){
+				@Override
+				protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+					param.args[0] = 1;
+				}
+			});
+		} catch(Throwable Throwable){}
 	}
 	
 	public static class CameraPreferences {
