@@ -54,7 +54,15 @@ public class CameraHook {
 			XposedHelpers.findAndHookMethod(Camera.class, "open", new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-					if (cameraPreferences.disableBackFacing) param.setResult(null);
+					if (cameraPreferences.disableBackFacing){
+						if (cameraPreferences.disableFrontFacing){
+							param.setResult(null);
+						} else {
+							// Use front facing if it is not disabled
+							Camera thisObject = (Camera) param.thisObject;
+							param.setResult(thisObject.open(1));
+						}
+					}
 				}
 			});
 		}
