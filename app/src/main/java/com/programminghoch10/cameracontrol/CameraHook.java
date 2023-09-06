@@ -48,7 +48,7 @@ public class CameraHook {
 			XposedHelpers.findAndHookMethod(Camera.class, "open", new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-					param.setResult((Camera)param.thisObject.open(1));
+					param.setResult(((Camera)param.thisObject).open(1));
 				}
 			});
 			
