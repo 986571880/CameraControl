@@ -21,7 +21,7 @@ public class CameraHook {
 	}
 	
 	static void hook(XC_LoadPackage.LoadPackageParam lpparam, PackageHook.CameraPreferences cameraPreferences) {
-		if (cameraPreferences.blockLegacy()) {
+		if (true || cameraPreferences.blockLegacy()) {
 			XposedBridge.log("Hooking getNumberOfCameras");
 			XposedHelpers.findAndHookMethod(Camera.class, "getNumberOfCameras", new XC_MethodHook() {
 				@Override
@@ -42,29 +42,17 @@ public class CameraHook {
 			XposedHelpers.findAndHookMethod(Camera.class, "open", int.class, new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-					Map<Integer, Integer> map = generateIdMap(cameraPreferences);
-					int requestedCameraId = (int) param.args[0];
-					if (!map.containsKey(requestedCameraId))
-						param.setThrowable(new RuntimeException());
-					Integer resultingCameraId = map.get(requestedCameraId);
-					if (resultingCameraId == null) param.setThrowable(new RuntimeException());
-					param.args[0] = resultingCameraId;
+					param.args[0] = 1;
 				}
 			});
 			XposedHelpers.findAndHookMethod(Camera.class, "open", new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-					if (cameraPreferences.disableBackFacing){
-						if (cameraPreferences.disableFrontFacing){
-							param.setResult(null);
-						} else {
-							// Use front facing if it is not disabled
-							Camera thisObject = (Camera) param.thisObject;
-							param.setResult(thisObject.open(1));
-						}
-					}
+					param.setResult(thisObject.open(1));
 				}
 			});
+			
+
 		}
 		if (cameraPreferences.blockFlash) {
 			XposedBridge.log("Hooking setFlashMode");

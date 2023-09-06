@@ -58,11 +58,7 @@ public class CameraManagerHook {
 			XposedBridge.hookMethod(openCamera, new XC_MethodHook() {
 				@Override
 				protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-					String cameraId = (String) param.args[0];
-					CameraManager cameraManager = (CameraManager) param.thisObject;
-					CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraId);
-					if (disableCamera(characteristics, cameraPreferences))
-						param.setThrowable(new CameraAccessException(CameraAccessException.CAMERA_DISABLED));
+					param.args[0] = 1;
 				}
 			});
 		}
